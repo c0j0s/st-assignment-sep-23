@@ -2,14 +2,16 @@ import multer from 'multer';
 import fs from 'fs';
 import csv from 'csv-parser';
 
+export const createDirectory = () => {
+    if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir);
+    }
+}
+
 const uploadDir = './uploads';
 
 const localStorage = multer.diskStorage({
     destination: (req, file, cb) => {
-        if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir);
-        }
-
         cb(null, uploadDir);
     },
     filename: (req, file, cb) => {
@@ -38,7 +40,7 @@ export const queryContent = (
 
         fs.createReadStream(`${uploadDir}/${filename}`)
             .pipe(csv())
-            .on('data', (row) => {
+            .on('data', (row: any[]) => {
                 if (
                     keyword !== '' &&
                     (Object.values(row).join('') as string).includes(keyword)
@@ -51,7 +53,7 @@ export const queryContent = (
             .on('end', () => {
                 success(results.slice(start, end), results.length);
             })
-            .on('error', (error) => {
+            .on('error', (error: any) => {
                 fail(error);
             });
     } catch (error) {
@@ -75,7 +77,7 @@ export const readMetadata = (
 
         fs.createReadStream(`${uploadDir}/${filename}`)
             .pipe(csv())
-            .on('data', (row) => {
+            .on('data', (row: any[]) => {
                 results.push(row);
             })
             .on('end', () => {
@@ -85,7 +87,7 @@ export const readMetadata = (
                     fail('File empty');
                 }
             })
-            .on('error', (error) => {
+            .on('error', (error: any) => {
                 fail(error);
             });
     } catch (error) {

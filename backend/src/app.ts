@@ -1,12 +1,14 @@
 import express, { Express, Request, Response } from 'express';
 import dotenv from 'dotenv';
 import cors from './middleware/cors';
-import { storage, readMetadata, getFiles, queryContent } from './utils/storage';
+import { storage, readMetadata, getFiles, queryContent, createDirectory } from './utils/storage';
 
 dotenv.config();
 
 const app: Express = express();
 const port = process.env.PORT || 3000;
+
+createDirectory();
 
 app.use(cors);
 
