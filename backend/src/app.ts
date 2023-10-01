@@ -1,7 +1,13 @@
 import express, { Express, Request, Response } from 'express';
 import dotenv from 'dotenv';
 import cors from './middleware/cors';
-import { storage, readMetadata, getFiles, queryContent, createDirectory } from './utils/storage';
+import {
+    storage,
+    readMetadata,
+    getFiles,
+    queryContent,
+    createDirectory
+} from './utils/storage';
 
 dotenv.config();
 

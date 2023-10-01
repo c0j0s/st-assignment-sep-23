@@ -2,13 +2,22 @@
   "name": "st-assignment-sep-23",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
-    "prettier": "prettier --config .prettierrc './**/src/**/*.{ts,tsx,svelte}' --write"
+    "setup-server": "cd backend && npm i",
+    "setup-client": "cd frontend && npm i",
+    "setup": "concurrently \"npm run setup-server\" \"npm run setup-client\"",
+    "build-server": "cd backend && npm run build",
+    "build-client": "cd frontend && npm run build",
+    "build": "concurrently \"npm run build-server\" \"npm run build-client\"",
+    "start-server": "cd backend && npm start",
+    "start-client": "cd frontend && npm run dev",
+    "start": "concurrently \"npm run start-server\" \"npm run start-client\"",
+    "prettier": "prettier --config .prettierrc './**/src/**/*.{ts,tsx,svelte}' --write --plugin prettier-plugin-svelte"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "prettier": "^3.0.3"
+    "prettier": "^3.0.3",
+    "prettier-plugin-svelte": "^3.0.3"
   }
 }

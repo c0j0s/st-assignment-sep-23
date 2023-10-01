@@ -6,7 +6,7 @@ export const createDirectory = () => {
     if (!fs.existsSync(uploadDir)) {
         fs.mkdirSync(uploadDir);
     }
-}
+};
 
 const uploadDir = './uploads';
 

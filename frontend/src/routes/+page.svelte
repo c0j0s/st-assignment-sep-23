@@ -100,9 +100,14 @@
             </InputWrapper>
 
             {#if !isUploading}
-            <Button variant="light" color="blue" fullSize on:click={uploadFile}>
-                Upload
-            </Button>
+                <Button
+                    variant="light"
+                    color="blue"
+                    fullSize
+                    on:click={uploadFile}
+                >
+                    Upload
+                </Button>
             {/if}
 
             {#if isUploading}
