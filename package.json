@@ -1,0 +1,14 @@
+{
+  "name": "st-assignment-sep-23",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "prettier": "prettier --config .prettierrc './**/src/**/*.{ts,tsx,svelte}' --write"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "prettier": "^3.0.3"
+  }
+}
