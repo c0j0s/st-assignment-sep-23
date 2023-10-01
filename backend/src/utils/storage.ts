@@ -27,7 +27,7 @@ export const readContent = (
     start: number,
     end: number,
     success: (data: string[][]) => void,
-    fail: (err: any) => void,
+    fail: (err: any) => void
 ) => {
     const results: string[][] = [];
     console.log(`[readContent] reading ${filename}: ${start} -> ${end}`);
@@ -41,14 +41,14 @@ export const readContent = (
             success(results.slice(start, end));
         })
         .on('error', (error) => {
-            fail(error)
+            fail(error);
         });
-}
+};
 
 export const readMetadata = (
     filename: string,
     success: (header: string[], count: number) => void,
-    fail: (err: any) => void,
+    fail: (err: any) => void
 ) => {
     const results: string[][] = [];
     console.log(`[readMetadata] reading ${filename}`);
@@ -62,11 +62,10 @@ export const readMetadata = (
             if (results.length > 0) {
                 success(Object.keys(results[0]), results.length - 1);
             } else {
-                fail("File empty")
+                fail('File empty');
             }
         })
         .on('error', (error) => {
-            fail(error)
+            fail(error);
         });
-}
-
+};
