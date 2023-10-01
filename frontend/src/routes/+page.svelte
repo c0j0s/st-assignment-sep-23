@@ -11,15 +11,13 @@
     Progress,
     Text
   } from '@svelteuidev/core';
-  import Toast from '../lib/Toast.svelte';
-
-  const endpoint = `http://localhost:3000/upload`;
+  import Toast from '$lib/toast.svelte';
+  import { postFile } from '$lib/endpoint';
 
   let selectedFile: File | undefined;
   let isUploading: boolean = false;
   let uploadProgress: number = 0;
   let uploadedFiles: string[] = [];
-  let error: string = '';
 
   let showToast = false;
   let toastMessage = '';
@@ -33,30 +31,25 @@
   }
 
   async function uploadFile() {
-    showToastMessage('Uploading');
-    error = '';
+    isUploading = true;
     if (selectedFile) {
       const formData = new FormData();
       formData.append('file', selectedFile);
 
-      try {
-        console.log('Upload file to: ', endpoint);
-        const response = (await axios.post(endpoint, formData, {
-          onUploadProgress: (progressEvent) => {
-            uploadProgress = Math.round(
-              (progressEvent.loaded * 100) /
-                (progressEvent.total ?? selectedFile!.size)
-            );
-          }
-        })) as AxiosResponse;
-
-        if (response.status === 200) {
-          showToastMessage(response.data['message'], 'success');
-          uploadedFiles = [...uploadedFiles, response.data['data']];
+      await postFile(
+        formData,
+        (progress: number) => {
+          uploadProgress = progress;
+        },
+        (message: string, fileName: string) => {
+          showToastMessage(message, 'success');
+          uploadedFiles = [...uploadedFiles, fileName];
+          uploadProgress = 0;
+        },
+        (err: string) => {
+          showToastMessage('File upload failed.', 'error');
         }
-      } catch (error) {
-        showToastMessage('File upload failed.', 'error');
-      }
+      );
     } else {
       showToastMessage('No file selected.', 'error');
     }
