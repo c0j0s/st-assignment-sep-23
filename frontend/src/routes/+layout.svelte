@@ -1,12 +1,14 @@
 <script>
-	import { SvelteUIProvider } from '@svelteuidev/core';
+	import { Text, Container, SvelteUIProvider } from '@svelteuidev/core';
 </script>
 
 
 <SvelteUIProvider>
 	<nav> 
-		<a href="/">home</a>
+		<Text variant='link' root='a' href={`/`}>
+			home
+		</Text>
 	</nav>
 
-    <slot/>
+	<slot/>
 </SvelteUIProvider>

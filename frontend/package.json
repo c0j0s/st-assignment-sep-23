@@ -1,9 +1,10 @@
 {
 	"name": "st-assignment-frontend",
 	"version": "0.0.1",
+	"author": "cojos",
 	"private": true,
 	"scripts": {
-		"dev": "vite dev",
+		"dev": "vite dev --port 5000",
 		"build": "vite build",
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json",
@@ -20,6 +21,8 @@
 	"type": "module",
 	"dependencies": {
 		"@svelteuidev/composables": "^0.15.3",
-		"@svelteuidev/core": "^0.15.3"
+		"@svelteuidev/core": "^0.15.3",
+		"axios": "^1.5.1",
+		"radix-icons-svelte": "^1.2.1"
 	}
 }
