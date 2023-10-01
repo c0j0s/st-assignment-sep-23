@@ -135,7 +135,7 @@
 
 <!-- Bottom Pagination -->
 {#if totalContentCount > limit}
-    <Paper class="fixed bottom-0 w-full p-4">
+    <Paper class="fixed left-0 bottom-0 p-4 w-full">
         <Flex justify="center" gap="md" class="items-center">
             <ActionIcon
                 variant="filled"
