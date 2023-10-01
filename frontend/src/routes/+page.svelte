@@ -99,9 +99,11 @@
                 <Input type="file" accept=".csv" on:change={handleFileChange} />
             </InputWrapper>
 
+            {#if !isUploading}
             <Button variant="light" color="blue" fullSize on:click={uploadFile}>
                 Upload
             </Button>
+            {/if}
 
             {#if isUploading}
                 <Progress
