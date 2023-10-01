@@ -10,8 +10,6 @@ export async function load({ params }) {
     const res = (await axios.get(url)) as AxiosResponse;
 
     if (res.status === 200) {
-        console.log(res.data);
-        var contentCount = res.data['count'];
         var header: string[] = res.data['header'];
     } else {
         throw new Error('Network error.');
@@ -20,7 +18,6 @@ export async function load({ params }) {
     return {
         fileId,
         fileName,
-        header,
-        contentCount
+        header
     };
 }

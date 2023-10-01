@@ -1,9 +1,7 @@
 import express, { Express, Request, Response } from 'express';
 import dotenv from 'dotenv';
-import multer from 'multer';
-import path from 'path';
 import cors from './middleware/cors';
-import { storage, readMetadata, readContent } from './utils/storage';
+import { storage, readMetadata, getFiles, queryContent } from './utils/storage';
 
 dotenv.config();
 
@@ -17,18 +15,25 @@ app.use((req, res, next) => {
     next();
 });
 
+/**
+ * List files uploaded
+ */
 app.get('/', (req: Request, res: Response) => {
-    res.send(`Express + TypeScript Server Live at http://localhost:${port}`);
+    getFiles((files) => {
+        res.status(200).json(files);
+    });
 });
 
+/**
+ * Get file header and data count
+ */
 app.get('/meta/:filepath', (req: Request, res: Response) => {
     try {
         readMetadata(
             req.params['filepath'],
             (header: string[], count: number) => {
                 res.status(200).json({
-                    header: header,
-                    count: count
+                    header: header
                 });
             },
             (err: any) => {
@@ -41,23 +46,28 @@ app.get('/meta/:filepath', (req: Request, res: Response) => {
     }
 });
 
-app.get('/data/:filepath', (req: Request, res: Response) => {
+/**
+ * Query file
+ */
+app.get('/query/:filepath', (req: Request, res: Response) => {
     try {
+        const keyword = (req.query.keyword as string) || '';
         const page = parseInt(req.query.page as string) || 1;
         const limit = parseInt(req.query.limit as string) || 10;
 
         let start = (page - 1) * limit;
         let end = start + limit;
 
-        readContent(
+        queryContent(
             req.params['filepath'],
+            keyword,
             start,
             end,
-            (data: string[][]) => {
+            (content: string[][], totalContentCount: number) => {
                 res.status(200).json({
                     page: page,
-                    count: limit,
-                    data: data
+                    content: content,
+                    totalContentCount: totalContentCount
                 });
             },
             (err: any) => {
@@ -70,6 +80,9 @@ app.get('/data/:filepath', (req: Request, res: Response) => {
     }
 });
 
+/**
+ * Handle file upload
+ */
 app.post('/upload', storage.single('file'), (req: Request, res: Response) => {
     try {
         if (!req.file) {

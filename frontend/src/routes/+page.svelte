@@ -1,6 +1,5 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import axios, { type AxiosResponse } from 'axios';
     import {
         Button,
         Container,
@@ -12,7 +11,7 @@
         Text
     } from '@svelteuidev/core';
     import Toast from '$lib/toast.svelte';
-    import { postFile } from '$lib/endpoint';
+    import { getUploadedFiles, postFile } from '$lib/endpoint';
 
     let selectedFile: File | undefined;
     let isUploading: boolean = false;
@@ -24,9 +23,10 @@
     let toastType = 'default';
 
     function handleFileChange(event: Event) {
-        const input = event.target as HTMLInputElement;
+        let input = event.target as HTMLInputElement;
         if (input.files && input.files[0]) {
             selectedFile = input.files[0];
+            input.files = null;
         }
     }
 
@@ -45,6 +45,7 @@
                     showToastMessage(message, 'success');
                     uploadedFiles = [...uploadedFiles, fileName];
                     uploadProgress = 0;
+                    selectedFile = undefined;
                 },
                 (err: string) => {
                     showToastMessage('File upload failed.', 'error');
@@ -54,6 +55,17 @@
             showToastMessage('No file selected.', 'error');
         }
         isUploading = false;
+    }
+
+    async function loadFileList() {
+        await getUploadedFiles(
+            (files) => {
+                uploadedFiles = [...uploadedFiles, ...files];
+            },
+            (err) => {
+                console.log(err);
+            }
+        );
     }
 
     function showToastMessage(message: string, type: string = 'default') {
@@ -70,10 +82,12 @@
 
     onMount(() => {
         uploadProgress = 0;
+        loadFileList();
     });
 </script>
 
 <Container size="xs" override={{ px: 'lg' }}>
+    <Toast message={toastMessage} visible={showToast} type={toastType} />
     <Card shadow="sm" padding="lg">
         <Flex direction="column" gap="md">
             <InputWrapper
@@ -101,16 +115,16 @@
 
             {#if uploadedFiles.length > 0}
                 <div>
-                    <Text size="lg">Uploaded Files</Text>
+                    <Text size="lg" class="p-2">Uploaded Files</Text>
                     <ul>
-                        {#each uploadedFiles as item}
-                            <li>
+                        {#each uploadedFiles as item, idx}
+                            <li class="p-2">
                                 <Text
                                     variant="link"
                                     root="a"
                                     href={`/data/${item}`}
                                 >
-                                    {item.slice(14)}
+                                    {idx + 1}. {item.slice(14)}
                                 </Text>
                             </li>
                         {/each}
@@ -119,5 +133,4 @@
             {/if}
         </Flex>
     </Card>
-    <Toast message={toastMessage} visible={showToast} type={toastType} />
 </Container>

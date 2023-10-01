@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import { loadPage } from '$lib/endpoint.js';
+    import { queryFileData } from '$lib/endpoint.js';
     import {
         Text,
         Paper,
@@ -8,109 +8,156 @@
         Button,
         Overlay,
         Box,
-        Loader
+        Loader,
+        Input,
+        NumberInput,
+        ActionIcon
     } from '@svelteuidev/core';
+    import { MagnifyingGlass } from 'radix-icons-svelte';
+
+    // server loaded data
     export let data;
+
     let isLoading: boolean = true;
     let tableContent: string[][] = [];
     let page: number = 1;
+    let indexBase: number = page;
     let limit: number = 30;
-    let pageLimit: number = data.contentCount / limit;
+    let totalContentCount: number = 542;
+    let pageLimit: number = totalContentCount / limit;
 
-    async function fetchData() {
+    let paginationControl: NumberInput;
+
+    async function fetchData(pg: number, kw: string = '') {
         isLoading = true;
-        try {
-            console.log('Load initial');
-            await loadPage(data.fileId, 1, limit, (content) => {
+        await queryFileData(
+            data.fileId,
+            kw,
+            pg,
+            limit,
+            (content, count) => {
                 tableContent = content;
+                totalContentCount = count;
+                indexBase = (page - 1) * limit;
                 isLoading = false;
-            });
-        } catch (error) {
-            console.error('Error fetching data:', error);
-        }
+            },
+            (err) => {
+                console.error('Error fetching data:', err);
+            }
+        );
     }
 
-    async function loadPrev() {
-        isLoading = true;
-        try {
-            console.log('Go prev');
-            await loadPage(data.fileId, page - 1, limit, (content) => {
-                tableContent = content;
-                page--;
-                isLoading = false;
-            });
-        } catch (error) {
-            console.log(error);
-        }
+    // React to page number
+    $: if (page > 0) {
+        fetchData(page, keyword);
     }
 
-    async function loadNext() {
-        isLoading = true;
-        try {
-            console.log('Go next');
-            await loadPage(data.fileId, page + 1, limit, (content) => {
-                tableContent = content;
-                page++;
-                isLoading = false;
-            });
-        } catch (error) {
-            console.log(error);
-        }
+    // React to keyword
+    let keyword: string = '';
+    $: if (keyword !== '') {
+        fetchData(1, keyword);
+    }
+
+    // React to totalContentCount changes
+    $: {
+        pageLimit = Math.ceil(totalContentCount / limit);
     }
 
     onMount(() => {
-        // load data on load
-        fetchData();
+        // fetch data on load
+        fetchData(page);
     });
 </script>
 
-<Paper>
+<Paper class="pb-28">
     <Flex direction="column" gap="md">
-        <Flex>
-            <Text size="lg" class="mb-4">{data.fileName}</Text>
+        <Flex class="justify-between items-center">
+            <Text size="lg" class="mb-4"
+                >{data.fileName} with {totalContentCount} entries {keyword !==
+                ''
+                    ? 'containing keyword ' + keyword
+                    : ''}</Text
+            >
+            <Input
+                icon={MagnifyingGlass}
+                placeholder="Search data"
+                bind:value={keyword}
+            />
         </Flex>
         <Box class="overflow-x-auto overflow-y-hidden">
-            <table class="table-auto">
+            <table class="table-auto border-2">
                 <thead>
                     <tr>
-                        <th>No.</th>
+                        <th class="border-2">No.</th>
                         {#each data.header as item}
-                            <th>{item}</th>
+                            <th class="border-2 whitespace-nowrap">{item}</th>
                         {/each}
                     </tr>
                 </thead>
                 <tbody>
+                    <!-- Display file data -->
                     {#each tableContent as row, idx}
                         <tr>
-                            <td>{(page - 1) * limit + idx + 1}</td>
+                            <td class="border-2">{indexBase + idx + 1}</td>
                             {#each row as cell}
-                                <td>{cell}</td>
+                                <td class="border-2 whitespace-nowrap"
+                                    >{cell}</td
+                                >
                             {/each}
                         </tr>
                     {/each}
                 </tbody>
-
-                {#if isLoading}
-                    <Overlay
-                        opacity={0.6}
-                        color="#000"
-                        zIndex={5}
-                        class="fixed top-0 right-0 bottom-0 left-0"
-                    >
-                        <div class="flex items-center justify-center h-screen">
-                            <Loader />
-                        </div>
-                    </Overlay>
-                {/if}
             </table>
-            <Flex justify="center" gap="md">
-                {#if page != 1}
-                    <Button on:click={loadPrev}>Prev</Button>
-                {/if}
-                {#if page < pageLimit}
-                    <Button on:click={loadNext}>Next</Button>
-                {/if}
-            </Flex>
+
+            <!-- Table empty indicator -->
+            {#if totalContentCount === 0}
+                <div class="flex items-center justify-center w-full h-full p-4">
+                    <Text class="text-center">No content available.</Text>
+                </div>
+            {/if}
+
+            <!-- Loading overlay -->
+            {#if isLoading}
+                <Overlay
+                    opacity={0.6}
+                    color="#000"
+                    zIndex={5}
+                    class="fixed top-0 right-0 bottom-0 left-0"
+                >
+                    <div class="flex items-center justify-center h-screen">
+                        <Loader />
+                    </div>
+                </Overlay>
+            {/if}
         </Box>
     </Flex>
 </Paper>
+
+<!-- Bottom Pagination -->
+{#if totalContentCount > limit}
+    <Paper class="fixed bottom-0 w-full p-4">
+        <Flex justify="center" gap="md" class="items-center">
+            <ActionIcon
+                variant="filled"
+                on:click={() => paginationControl.decrement()}
+                color="lime"
+                size="lg">-</ActionIcon
+            >
+            <NumberInput
+                bind:this={paginationControl}
+                hideControls
+                defaultValue={1}
+                min={1}
+                max={pageLimit}
+                bind:value={page}
+                step={1}
+            />
+            <ActionIcon
+                variant="filled"
+                on:click={() => paginationControl.increment()}
+                color="blue"
+                size="lg">+</ActionIcon
+            >
+        </Flex>
+    </Paper>
+{/if}

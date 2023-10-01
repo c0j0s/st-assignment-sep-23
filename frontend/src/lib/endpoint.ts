@@ -3,33 +3,34 @@ import axios from 'axios';
 
 const endpoint = `http://localhost:3000`;
 
-export async function loadPage(
+export async function queryFileData(
     fileId: string,
+    keyword: string,
     page: number,
     limit: number = 10,
-    success: (content: string[][]) => void
+    success: (content: string[][], totalContentCount: number) => void,
+    error: (err: string) => void
 ) {
-    if (page < 1) {
-        page = 1;
+    var url = `${endpoint}/query/${fileId}?page=${page}&limit=${limit}`;
+    if (keyword !== '') {
+        url += `&keyword=${keyword}`;
     }
 
-    const url = `${endpoint}/data/${fileId}?page=${page}&limit=${limit}`;
     const res = (await axios.get(url)) as AxiosResponse;
 
     if (res.status === 200) {
-        var data = res.data['data'] as any[];
-        if (data.length > 0) {
-            var content: string[][] = [];
-            data.forEach((value) => {
-                content.push(Object.values(value));
-            });
+        var data = res.data['content'] as any[];
+        var totalContentCount = res.data['totalContentCount'];
+        var content: string[][] = [];
+        data.forEach((value) => {
+            content.push(Object.values(value));
+        });
 
-            setTimeout(() => {
-                success(content);
-            }, 1000);
-        }
+        setTimeout(() => {
+            success(content, totalContentCount);
+        }, 500);
     } else {
-        throw new Error('Network error.');
+        error('Network error.');
     }
 }
 
@@ -53,6 +54,20 @@ export async function postFile(
 
     if (response.status === 200) {
         success(response.data['message'], response.data['data']);
+    } else {
+        console.log(response.headers);
+        error('Network error.');
+    }
+}
+
+export async function getUploadedFiles(
+    success: (file: string[]) => void,
+    error: (err: string) => void
+) {
+    const response = (await axios.get(endpoint)) as AxiosResponse;
+
+    if (response.status === 200) {
+        success(response.data);
     } else {
         console.log(response.headers);
         error('Network error.');
