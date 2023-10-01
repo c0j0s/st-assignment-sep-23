@@ -1,7 +1,7 @@
 import express, { Express, Request, Response } from 'express';
 import dotenv from 'dotenv';
-import multer from "multer";
-import path from "path";
+import multer from 'multer';
+import path from 'path';
 import cors from './middleware/cors';
 import { storage } from './utils/storage';
 
@@ -21,7 +21,7 @@ app.get('/', (req: Request, res: Response) => {
   res.send(`Express + TypeScript Server Live at http://localhost:${port}`);
 });
 
-app.post("/upload", storage.single("file"), (req: Request, res: Response) => {
+app.post('/upload', storage.single('file'), (req: Request, res: Response) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded.' });
@@ -31,13 +31,13 @@ app.post("/upload", storage.single("file"), (req: Request, res: Response) => {
     console.log(`Uploaded file: ${originalname} (${size} bytes)`);
 
     const modifiedFilename = req.file.filename;
-    return res.status(200).json({ 
-      message: 'File uploaded successfully', 
-      data: modifiedFilename });
-
+    return res.status(200).json({
+      message: 'File uploaded successfully',
+      data: modifiedFilename
+    });
   } catch (error) {
     return res.status(500).json({ error: 'File upload failed.' });
-  }  
+  }
 });
 
 app.listen(port, () => {
