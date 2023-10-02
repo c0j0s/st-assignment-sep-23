@@ -60,7 +60,6 @@ export async function postFile(
         if (response.status === 200) {
             success(response.data['message'], response.data['data']);
         } else {
-            console.log(response.headers);
             error('Network error.');
         }
     } catch (err) {
@@ -78,7 +77,6 @@ export async function getUploadedFiles(
         if (response.status === 200) {
             success(response.data);
         } else {
-            console.log(response.headers);
             error('Network error.');
         }
     } catch (err) {

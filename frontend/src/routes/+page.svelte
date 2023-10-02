@@ -11,6 +11,7 @@
         Text
     } from '@svelteuidev/core';
     import Toast from '$lib/toast.svelte';
+    import { error } from '@sveltejs/kit';
     import { getUploadedFiles, postFile } from '$lib/endpoint';
 
     let selectedFile: File | undefined;
@@ -63,7 +64,7 @@
                 uploadedFiles = [...uploadedFiles, ...files];
             },
             (err) => {
-                console.log(err);
+                throw error(404, 'Network error.');
             }
         );
     }
