@@ -2,13 +2,13 @@ import multer from 'multer';
 import fs from 'fs';
 import csv from 'csv-parser';
 
-export const createDirectory = () => {
-    if (!fs.existsSync(uploadDir)) {
-        fs.mkdirSync(uploadDir);
-    }
-};
-
 const uploadDir = './uploads';
+
+const checkFileExist = (filename: string) => {
+    if (!fs.existsSync(`${uploadDir}/${filename}`)) {
+        throw new Error("File not found");
+    }
+}
 
 const localStorage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -24,6 +24,12 @@ const localStorage = multer.diskStorage({
 
 export const storage = multer({ storage: localStorage });
 
+export const createDirectory = () => {
+    if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir);
+    }
+};
+
 export const queryContent = (
     filename: string,
     keyword: string,
@@ -33,6 +39,8 @@ export const queryContent = (
     fail: (err: any) => void
 ) => {
     try {
+        checkFileExist(filename);
+
         const results: string[][] = [];
         console.log(
             `[queryContent] reading ${filename}: find ${keyword} from ${start} -> ${end}`
@@ -67,10 +75,7 @@ export const readMetadata = (
     fail: (err: any) => void
 ) => {
     try {
-        if (!fs.existsSync(uploadDir)) {
-            fail('File not found');
-            return;
-        }
+        checkFileExist(filename);
 
         const results: string[][] = [];
         console.log(`[readMetadata] reading ${filename}`);
@@ -96,15 +101,12 @@ export const readMetadata = (
 };
 
 export const getFiles = (success: (list: string[]) => void) => {
-    try {
-        fs.readdir(uploadDir, (err, files) => {
-            if (err) {
-                console.error('Error reading directory:', err);
-                return;
-            }
-            success(files);
-        });
-    } catch (error) {
-        console.log(error);
-    }
+    fs.readdir(uploadDir, (err, files) => {
+        if (err) {
+            console.error('Error reading directory:', err);
+            success([]);
+            return;
+        }
+        success(files);
+    });
 };
