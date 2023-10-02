@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, Response } from 'express';
 
 export const uploadFile = async (request: Request, response: Response) => {
     if (!request.file) {
@@ -13,4 +13,4 @@ export const uploadFile = async (request: Request, response: Response) => {
         message: 'File uploaded successfully',
         data: modifiedFilename
     });
-}
+};

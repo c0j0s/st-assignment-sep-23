@@ -1,12 +1,11 @@
-import { Request, Response } from "express";
-import { getFiles, queryContent, readMetadata } from "../../lib/storage";
-
+import { Request, Response } from 'express';
+import { getFiles, queryContent, readMetadata } from '../../lib/storage';
 
 export const getUploadedFiles = async (_: Request, response: Response) => {
     getFiles((files) => {
         response.status(200).json(files);
     });
-}
+};
 
 export const getFileMetaData = async (request: Request, response: Response) => {
     try {
@@ -18,13 +17,13 @@ export const getFileMetaData = async (request: Request, response: Response) => {
                 });
             },
             (err: any) => {
-                response.status(404).json({ error: "File not found." });
+                response.status(404).json({ error: 'File not found.' });
             }
         );
     } catch (error) {
-        return response.status(500).json({ error: "Internal server error." });
+        return response.status(500).json({ error: 'Internal server error.' });
     }
-}
+};
 
 export const queryFileData = async (request: Request, response: Response) => {
     try {
@@ -49,10 +48,10 @@ export const queryFileData = async (request: Request, response: Response) => {
                 });
             },
             (err: string) => {
-                response.status(404).json({ error: "File not found." });
+                response.status(404).json({ error: 'File not found.' });
             }
         );
     } catch (error) {
-        return response.status(500).json({ error: "Internal server error." });
+        return response.status(500).json({ error: 'Internal server error.' });
     }
-}
+};

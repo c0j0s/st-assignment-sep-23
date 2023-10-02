@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { uploadFile } from "../../controllers";
+import { uploadFile } from '../../controllers';
 
 const app = express();
 app.post('/upload', uploadFile);
@@ -9,13 +9,13 @@ const mockRequest = {
     file: {
         originalname: 'data.csv',
         size: 12345,
-        filename: 'example_12345.txt',
-    },
+        filename: 'example_12345.txt'
+    }
 } as Request;
 
 const mockResponse = {
     status: jest.fn().mockReturnThis(),
-    json: jest.fn(),
+    json: jest.fn()
 } as unknown as Response;
 
 describe('POST /upload', () => {
@@ -24,7 +24,7 @@ describe('POST /upload', () => {
         expect(mockResponse.status).toHaveBeenCalledWith(200);
         expect(mockResponse.json).toHaveBeenCalledWith({
             message: 'File uploaded successfully',
-            data: 'example_12345.txt',
+            data: 'example_12345.txt'
         });
     });
 
@@ -32,6 +32,8 @@ describe('POST /upload', () => {
         mockRequest.file = undefined;
         await uploadFile(mockRequest, mockResponse);
         expect(mockResponse.status).toHaveBeenCalledWith(400);
-        expect(mockResponse.json).toHaveBeenCalledWith({ error: 'No file uploaded.' });
+        expect(mockResponse.json).toHaveBeenCalledWith({
+            error: 'No file uploaded.'
+        });
     });
 });

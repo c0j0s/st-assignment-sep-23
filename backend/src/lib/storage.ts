@@ -6,9 +6,9 @@ const uploadDir = './uploads';
 
 const checkFileExist = (filename: string) => {
     if (!fs.existsSync(`${uploadDir}/${filename}`)) {
-        throw new Error("File not found");
+        throw new Error('File not found');
     }
-}
+};
 
 const localStorage = multer.diskStorage({
     destination: (req, file, cb) => {
