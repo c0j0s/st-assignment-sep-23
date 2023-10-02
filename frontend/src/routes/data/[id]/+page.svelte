@@ -72,17 +72,27 @@
 <Paper class="pb-28">
     <Flex direction="column" gap="md">
         <Flex class="justify-between items-center">
-            <Text size="lg" class="mb-4"
-                >{data.fileName} with {totalContentCount} entries {keyword !==
-                ''
-                    ? 'containing keyword ' + keyword
-                    : ''}</Text
-            >
-            <Input
-                icon={MagnifyingGlass}
-                placeholder="Search data"
-                bind:value={keyword}
-            />
+            <Flex direction="column" >
+                <Text size="lg">
+                    {data.fileName} with {totalContentCount} entries
+                </Text>
+                {#if keyword !== ''}
+                    <Text size="lg">
+                        {'containing keyword ' + keyword}
+                    </Text>
+                {/if}
+            </Flex>
+
+            <Flex class="items-center" gap="sm">
+                {#if isLoading}
+                    <Loader />
+                {/if}
+                <Input
+                    icon={MagnifyingGlass}
+                    placeholder="Search data"
+                    bind:value={keyword}
+                />
+            </Flex>
         </Flex>
         <Box class="overflow-x-auto overflow-y-hidden">
             <table class="table-auto border-2">
@@ -114,20 +124,6 @@
                 <div class="flex items-center justify-center w-full h-full p-4">
                     <Text class="text-center">No content available.</Text>
                 </div>
-            {/if}
-
-            <!-- Loading overlay -->
-            {#if isLoading}
-                <Overlay
-                    opacity={0.6}
-                    color="#000"
-                    zIndex={5}
-                    class="fixed top-0 right-0 bottom-0 left-0"
-                >
-                    <div class="flex items-center justify-center h-screen">
-                        <Loader />
-                    </div>
-                </Overlay>
             {/if}
         </Box>
     </Flex>
