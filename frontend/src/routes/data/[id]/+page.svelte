@@ -72,7 +72,7 @@
 <Paper class="pb-28">
     <Flex direction="column" gap="md">
         <Flex class="justify-between items-center">
-            <Flex direction="column" >
+            <Flex direction="column">
                 <Text size="lg">
                     {data.fileName} with {totalContentCount} entries
                 </Text>

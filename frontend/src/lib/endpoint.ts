@@ -16,20 +16,23 @@ export async function queryFileData(
         url += `&keyword=${keyword}`;
     }
 
-    const res = (await axios.get(url)) as AxiosResponse;
+    try {
+        const res = (await axios.get(url)) as AxiosResponse;
+        if (res.status === 200) {
+            var data = res.data['content'] as any[];
+            var totalContentCount = res.data['totalContentCount'];
+            var content: string[][] = [];
+            data.forEach((value) => {
+                content.push(Object.values(value));
+            });
 
-    if (res.status === 200) {
-        var data = res.data['content'] as any[];
-        var totalContentCount = res.data['totalContentCount'];
-        var content: string[][] = [];
-        data.forEach((value) => {
-            content.push(Object.values(value));
-        });
-
-        setTimeout(() => {
-            success(content, totalContentCount);
-        }, 500);
-    } else {
+            setTimeout(() => {
+                success(content, totalContentCount);
+            }, 500);
+        } else {
+            error('Network error.');
+        }
+    } catch (err) {
         error('Network error.');
     }
 }
@@ -42,20 +45,25 @@ export async function postFile(
 ) {
     const url = `${endpoint}/upload/`;
 
-    const response = (await axios.post(url, data, {
-        onUploadProgress: (progressEvent) => {
-            onUploadProgress(
-                Math.round(
-                    (progressEvent.loaded * 100) / (progressEvent.total ?? 100)
-                )
-            );
-        }
-    })) as AxiosResponse;
+    try {
+        const response = (await axios.post(url, data, {
+            onUploadProgress: (progressEvent) => {
+                onUploadProgress(
+                    Math.round(
+                        (progressEvent.loaded * 100) /
+                            (progressEvent.total ?? 100)
+                    )
+                );
+            }
+        })) as AxiosResponse;
 
-    if (response.status === 200) {
-        success(response.data['message'], response.data['data']);
-    } else {
-        console.log(response.headers);
+        if (response.status === 200) {
+            success(response.data['message'], response.data['data']);
+        } else {
+            console.log(response.headers);
+            error('Network error.');
+        }
+    } catch (err) {
         error('Network error.');
     }
 }
@@ -64,12 +72,16 @@ export async function getUploadedFiles(
     success: (file: string[]) => void,
     error: (err: string) => void
 ) {
-    const response = (await axios.get(endpoint)) as AxiosResponse;
+    try {
+        const response = (await axios.get(endpoint)) as AxiosResponse;
 
-    if (response.status === 200) {
-        success(response.data);
-    } else {
-        console.log(response.headers);
+        if (response.status === 200) {
+            success(response.data);
+        } else {
+            console.log(response.headers);
+            error('Network error.');
+        }
+    } catch (err) {
         error('Network error.');
     }
 }
